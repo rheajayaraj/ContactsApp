@@ -1,6 +1,7 @@
 const { User } = require("../../models/user");
 const Joi = require("joi");
 const crypto = require("crypto");
+const decrypt=require('../../middleware/saltdecrypt')
 
 module.exports = async (req, res) => {
     try {
@@ -11,15 +12,9 @@ module.exports = async (req, res) => {
         });
         const { error } = schema.validate(req.body);
         if (error) return res.status(400).send(error.details[0].message);
-
-        const secretKey = 'Password';
-        const salt = 'Reset'; 
-        const key = crypto.scryptSync(secretKey, salt, 32); 
-        const iv = Buffer.from('26c5c981d12e7a23b21cb128ac3fbd69', 'hex');
-        const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-        const decryptedData = decipher.update(req.body.encrypt, 'hex', 'utf8') + decipher.final('utf8');
-            const data = JSON.parse(decryptedData);
-            console.log('Decrypted JSON:', data);
+        const decryptedData = await decrypt(req.body.encrypt)
+        const data = JSON.parse(decryptedData);
+        console.log('Decrypted JSON:', data);
         const currentTimestamp = new Date().getTime();
         const otpTimestamp = new Date(data.timestamp).getTime();
         const oneHour = 60 * 60 * 1000; // One hour in milliseconds

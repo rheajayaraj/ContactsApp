@@ -1,6 +1,6 @@
 const { User } = require("../../models/user");
 const SENDMAIL = require("../../utils/sendemail");
-const crypto = require("crypto");
+const encrypt=require('../../middleware/saltencrypt')
 const Joi = require("joi");
 const speakeasy = require('speakeasy'); 
 
@@ -23,13 +23,7 @@ module.exports = async (req, res) => {
         const jsonData = { otp: code, timestamp: timestamp};
         console.log(jsonData)
         const jsonDataString = JSON.stringify(jsonData);
-        const secretKey = 'Password';
-        const salt = 'Reset'; 
-        const key = crypto.scryptSync(secretKey, salt, 32); 
-        const iv = Buffer.from('26c5c981d12e7a23b21cb128ac3fbd69', 'hex');
-        const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-        let encryptedData = cipher.update(jsonDataString, 'utf8', 'hex');
-        encryptedData += cipher.final('hex');
+        let encryptedData = await encrypt(jsonDataString)
 
         const resetLink = `localhost:3000/api/reset/${user._id}`;
         const emailOptions = {
