@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
           email: req.body.email,
           tags: req.body.tags,
           user_id: user.id,
-          image: imageData  // Assign the signed URL to the 'image' property
+          image: imageData, // Assign the signed URL to the 'image' property
         });
 
         try {
