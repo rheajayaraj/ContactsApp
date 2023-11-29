@@ -15,11 +15,15 @@ const contactSchema = new mongoose.Schema({
     },
     tags:{
         type:[String],
-        required: true
+        required: false
     },
     user_id: {
         required: true,
         type: String
+    },
+    image:{
+        type: String,
+        required: false
     }
 })
 
