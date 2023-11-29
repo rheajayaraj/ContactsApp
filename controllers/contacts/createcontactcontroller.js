@@ -15,6 +15,7 @@ module.exports=async (req, res) => {
                 name: req.body.name,
                 contact: req.body.contact,
                 email: req.body.email,
+                tags: req.body.tags,
                 user_id: user.id
             })
             try {

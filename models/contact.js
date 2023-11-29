@@ -13,6 +13,10 @@ const contactSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    tags:{
+        type:[String],
+        required: true
+    },
     user_id: {
         required: true,
         type: String

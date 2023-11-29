@@ -12,7 +12,7 @@ module.exports=async (req, res) => {
         const user = await User.findById(decoded.id)
         if (user){
             const contact = req.params.contact;
-            const updatedData = {name:req.body.name, contact:req.body.contact, email:req.body.email};
+            const updatedData = {name:req.body.name, contact:req.body.contact, email:req.body.email, tags:req.body.tags};
             const options = { new: true };
             const contactv = await Contacts.findOne({contact:contact})
             if (contactv.user_id==user.id){
