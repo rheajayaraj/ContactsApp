@@ -9,16 +9,22 @@ module.exports = async (req, res) => {
     const decoded = await verify(decryptedData);
     const user = await User.findById(decoded.id);
     if (user) {
-      const contacts = await Contacts.find({ user_id: user.id });
-      let tagsSet = new Set();
-      contacts.forEach((contact) => {
-        contact.tags.forEach((tag) => {
-          tagsSet.add(tag);
-        });
-      });
-      const uniqueTags = [...tagsSet];
-      if (uniqueTags.length > 0) {
-        res.json(uniqueTags);
+      const tags = await Contacts.aggregate([
+        {
+          $match: { user_id: user.id },
+        },
+        {
+          $unwind: '$tags',
+        },
+        {
+          $group: {
+            _id: null,
+            uniqueTags: { $addToSet: '$tags' },
+          },
+        },
+      ]);
+      if (tags.length > 0 && tags[0].uniqueTags.length > 0) {
+        res.json(tags[0].uniqueTags);
       } else {
         res.json({ message: 'No contacts found with the specified tag' });
       }
