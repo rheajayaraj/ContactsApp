@@ -12,6 +12,7 @@ module.exports = async (req, res) => {
     data = new User({
       name: req.body.name,
       email: req.body.email,
+      contact: req.body.contact,
       password: req.body.password,
     });
     const dataToSave = await data.save();

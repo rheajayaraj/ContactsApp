@@ -8,6 +8,10 @@ const userSchema = new mongoose.Schema({
     minlength: 5,
     maxlength: 50,
   },
+  contact: {
+    required: true,
+    type: String,
+  },
   email: {
     type: String,
     required: true,
@@ -20,6 +24,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 5,
     maxlength: 1024,
+  },
+  image: {
+    type: String,
+    required: false,
   },
 });
 
