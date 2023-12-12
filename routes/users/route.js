@@ -4,10 +4,16 @@ const signup = require('../../controllers/users/signupcontroller');
 const login = require('../../controllers/users/logincontroller');
 const passwordreset = require('../../controllers/users/passwordresetcontroller');
 const forgotpassword = require('../../controllers/users/forgotpasswordcontroller');
+const userdetails = require('../../controllers/users/userdetailscontroller');
+const userupdate = require('../../controllers/users/updateusercontroller');
+const deleteuser = require('../../controllers/users/deleteusercontroller');
 
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgotpassword', forgotpassword);
 router.post('/reset/:userId', passwordreset);
+router.post('/user', userdetails);
+router.post('/userupdate', userupdate);
+router.post('/deleteuser', deleteuser);
 
 module.exports = router;
