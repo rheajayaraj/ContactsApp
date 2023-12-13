@@ -9,6 +9,7 @@ module.exports = async (req, res) => {
       password: Joi.string().required(),
       otp: Joi.string().required(),
       encrypt: Joi.string().required(),
+      email: Joi.string().email().required(),
     });
     const { error } = schema.validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -24,7 +25,7 @@ module.exports = async (req, res) => {
       currentTimestamp < otpTimestamp + oneHour
     ) {
       // Reset the user's password and delete the token
-      const user = await User.findById(req.params.userId);
+      const user = await User.findOne({ email: req.body.email });
       if (!user) {
         return res.status(404).json({ error: 'User not found.' });
       }

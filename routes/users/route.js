@@ -11,9 +11,9 @@ const deleteuser = require('../../controllers/users/deleteusercontroller');
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgotpassword', forgotpassword);
-router.post('/reset/:userId', passwordreset);
+router.post('/reset', passwordreset);
 router.post('/user', userdetails);
-router.post('/userupdate', userupdate);
-router.post('/deleteuser', deleteuser);
+router.patch('/userupdate', userupdate);
+router.delete('/deleteuser', deleteuser);
 
 module.exports = router;

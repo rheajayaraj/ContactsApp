@@ -15,15 +15,15 @@ module.exports = async (req, res) => {
         return res.status(400).json({ message: err });
       }
 
-      decryptedData = await decrypt(req.body.JWT_token);
+      decryptedData = await decrypt(req.headers.authorization);
       const decoded = await verify(decryptedData);
       const user = await User.findById(decoded.id);
 
       if (user) {
         // The signed URL is retrieved from req.file.signedUrl
         let imageData = '';
-        if (req.file && req.file.signedUrl) {
-          imageData = req.file.signedUrl;
+        if (req.file && req.file.objectKey) {
+          imageData = req.file.objectKey;
         }
         const data = new Contacts({
           name: req.body.name,

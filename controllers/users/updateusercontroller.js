@@ -3,9 +3,11 @@ const { User } = require('../../models/user');
 const decrypt = require('../../middleware/saltdecrypt');
 const verify = require('../../middleware/jwtverify');
 const uploadImage = require('../../middleware/uploadimg');
+const deleteFromS3 = require('../../middleware/deleteFromS3'); // Function to delete from S3
 
-const updateProfile = async (req, res) => {
+module.exports = async (req, res) => {
   try {
+    // Using uploadImage middleware
     uploadImage(req, res, async function (err) {
       if (err instanceof multer.MulterError) {
         return res.status(400).json({ message: err.message });
@@ -13,30 +15,31 @@ const updateProfile = async (req, res) => {
         return res.status(400).json({ message: err });
       }
 
-      decryptedData = await decrypt(req.header.authorization);
+      decryptedData = await decrypt(req.headers.authorization);
       const decoded = await verify(decryptedData);
       const user = await User.findById(decoded.id);
 
       if (user) {
         let imageData = '';
-        if (req.file && req.file.signedUrl) {
-          imageData = req.file.signedUrl;
+        if (req.file && req.file.objectKey) {
+          imageData = req.file.objectKey;
+
+          // Delete the existing image from S3 if it exists
+          if (user.image) {
+            await deleteFromS3(user.image);
+          }
         }
 
-        // Update user information
-        user.name = req.body.name;
-        user.contact = req.body.contact;
-        user.email = req.body.email;
-        user.image = imageData; // Assign the signed URL to the 'image' property
+        // Update user details including the new image URL
+        user.name = req.body.name || user.name;
+        user.contact = req.body.contact || user.contact;
+        user.email = req.body.email || user.email;
+        user.image = imageData || user.image; // Preserve existing image if no new image
 
-        try {
-          await user.save();
-          res
-            .status(200)
-            .json({ message: 'User details updated successfully' });
-        } catch (error) {
-          res.status(400).json({ message: error.message });
-        }
+        // Save the updated user
+        const updatedUser = await user.save();
+
+        res.status(200).json(updatedUser);
       }
     });
   } catch (error) {
@@ -44,5 +47,3 @@ const updateProfile = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-module.exports = updateProfile;

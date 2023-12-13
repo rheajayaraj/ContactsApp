@@ -1,9 +1,4 @@
-const {
-  S3Client,
-  GetObjectCommand,
-  GetObjectCommandOutput,
-} = require('@aws-sdk/client-s3');
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const multerS3 = require('multer-s3');
 const multer = require('multer');
 
@@ -44,33 +39,32 @@ function sanitizeFile(file, cb) {
 
 const uploadImage = multer({
   storage: s3Storage,
-  fileFilter: (req, file, callback) => {
-    sanitizeFile(file, callback);
-  },
-  limits: {
-    fileSize: 1024 * 1024 * 2, // 2mb file size
-  },
+  // fileFilter: (req, file, callback) => {
+  //   sanitizeFile(file, callback);
+  // },
+  // limits: {
+  //   fileSize: 1024 * 1024 * 8, // 2mb file size
+  // },
 }).single('image');
 
-// Generate a pre-signed URL for the uploaded file
 module.exports = async (req, res, next) => {
   try {
     uploadImage(req, res, async function (err) {
-      if (err) {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({ message: err.message });
+      } else if (err) {
         return res.status(400).json({ message: err });
       }
 
-      const params = {
-        Bucket: 'contactsimg',
-        Key: req.file.key,
-        Expires: 3600, // Expiration time for the pre-signed URL in seconds (e.g., 1 hour)
-      };
+      if (req.file) {
+        // Save the object key in req.file.objectKey
+        req.file.objectKey = req.file.key;
 
-      const command = new GetObjectCommand(params);
-      const signedUrl = await getSignedUrl(s3, command, { expiresIn: 60 });
-
-      req.file.signedUrl = signedUrl; // Save the signed URL in req.file.signedUrl
-      next(); // Move to the next middleware (e.g., the controller)
+        // Move to the next middleware (e.g., the controller)
+        next();
+      } else {
+        return res.status(400).json({ message: 'File key not found' });
+      }
     });
   } catch (error) {
     console.error('Error:', error);

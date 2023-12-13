@@ -10,8 +10,8 @@ const viewtag = require('../../controllers/contacts/viewtagscontroller');
 router.post('/create', createcontact);
 router.get('/viewAll', viewcontacts);
 router.get('/view/:contact', viewcontact);
-router.patch('/update/:contact', updatecontact);
-router.delete('/delete', deletecontact);
+router.post('/update/:contact', updatecontact);
+router.delete('/delete/:id', deletecontact);
 router.get('/tag', viewtag);
 
 module.exports = router;
