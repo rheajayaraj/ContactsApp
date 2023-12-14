@@ -8,7 +8,6 @@ module.exports = async function (req, res) {
     if (!user) {
       return res.status(400).json({ error: "User doesn't exist" });
     }
-
     const isPasswordValid = req.body.password === user.password;
     if (!isPasswordValid) {
       return res.status(400).json({ error: "Password doesn't match" });
@@ -22,6 +21,6 @@ module.exports = async function (req, res) {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Internal server error' }); // Change status code if needed
+    res.status(500).json({ error: 'Internal server error' });
   }
 };

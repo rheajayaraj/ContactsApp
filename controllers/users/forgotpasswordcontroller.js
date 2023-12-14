@@ -6,28 +6,21 @@ const speakeasy = require('speakeasy');
 
 module.exports = async (req, res) => {
   try {
-    // const schema = Joi.object({ email: Joi.string().email().required() });
-    // const { error } = schema.validate(req.body);
-    //if (error) return res.status(400).send(error.details[0].message);
-
     const user = await User.findOne({ email: req.body.email });
     if (!user)
       return res
         .status(400)
         .json({ error: "User with given email doesn't exist" });
-
     const secret = speakeasy.generateSecret({ length: 20 });
     const code = speakeasy.totp({
       secret: secret.base32,
       encoding: 'base32',
     });
-
     const timestamp = new Date();
     const jsonData = { otp: code, timestamp: timestamp };
     console.log(jsonData);
     const jsonDataString = JSON.stringify(jsonData);
     let encryptedData = await encrypt(jsonDataString);
-
     const emailOptions = {
       from: '<rheajayaraj1@gmail.com>',
       to: user.email,

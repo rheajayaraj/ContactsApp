@@ -9,10 +9,6 @@ const contactSchema = new mongoose.Schema({
     required: true,
     type: String,
   },
-  email: {
-    required: true,
-    type: String,
-  },
   tags: {
     type: [String],
     required: false,

@@ -1,7 +1,6 @@
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const multerS3 = require('multer-s3');
 const multer = require('multer');
-
 const s3 = new S3Client({
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -9,7 +8,6 @@ const s3 = new S3Client({
   },
   region: 'ap-south-1',
 });
-
 const s3Storage = multerS3({
   s3: s3,
   bucket: 'contactsimg',
@@ -39,12 +37,12 @@ function sanitizeFile(file, cb) {
 
 const uploadImage = multer({
   storage: s3Storage,
-  // fileFilter: (req, file, callback) => {
-  //   sanitizeFile(file, callback);
-  // },
-  // limits: {
-  //   fileSize: 1024 * 1024 * 8, // 2mb file size
-  // },
+  fileFilter: (req, file, callback) => {
+    sanitizeFile(file, callback);
+  },
+  limits: {
+    fileSize: 1024 * 1024 * 8,
+  },
 }).single('image');
 
 module.exports = async (req, res, next) => {
@@ -55,12 +53,8 @@ module.exports = async (req, res, next) => {
       } else if (err) {
         return res.status(400).json({ message: err });
       }
-
       if (req.file) {
-        // Save the object key in req.file.objectKey
         req.file.objectKey = req.file.key;
-
-        // Move to the next middleware (e.g., the controller)
         next();
       } else {
         return res.status(400).json({ message: 'File key not found' });

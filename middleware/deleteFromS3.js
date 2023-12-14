@@ -1,5 +1,4 @@
 const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3');
-
 const s3 = new S3Client({
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -14,7 +13,6 @@ async function deleteFromS3(objectKey) {
       Bucket: 'contactsimg',
       Key: objectKey,
     };
-
     const command = new DeleteObjectCommand(params);
     await s3.send(command);
     console.log('Object deleted successfully from S3');

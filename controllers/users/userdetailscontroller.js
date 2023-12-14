@@ -2,7 +2,7 @@ const { User, validate } = require('../../models/user');
 const decrypt = require('../../middleware/saltdecrypt');
 const verify = require('../../middleware/jwtverify');
 
-const getUserDetails = async (req, res) => {
+module.exports = async (req, res) => {
   try {
     decryptedData = await decrypt(req.headers.authorization);
     console.log(decryptedData);
@@ -17,5 +17,3 @@ const getUserDetails = async (req, res) => {
     res.status(401).json({ error: 'Unauthorized' });
   }
 };
-
-module.exports = getUserDetails;

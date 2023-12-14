@@ -1,15 +1,17 @@
 const { User, validate } = require('../../models/user');
+const Contact = require('../../models/contact');
 const decrypt = require('../../middleware/saltdecrypt');
 const verify = require('../../middleware/jwtverify');
+const deleteFromS3 = require('../../middleware/deleteFromS3');
 
 module.exports = async (req, res) => {
   try {
-    decryptedData = await decrypt(req.header.authorization);
+    decryptedData = await decrypt(req.headers.authorization);
     console.log(decryptedData);
     const decoded = await verify(decryptedData);
     console.log(decoded);
-    const userId = decoded.id;
-    const deletedUser = await User.findByIdAndDelete(userId);
+    await Contact.deleteMany({ user_id: decoded.id });
+    const deletedUser = await User.findByIdAndDelete(decoded.id);
     if (deletedUser) {
       res.status(200).json({ message: 'User deleted successfully' });
     } else {
