@@ -7,12 +7,17 @@ const s3 = new S3Client({
   region: 'ap-south-1',
 });
 
-async function deleteFromS3(objectKey) {
+async function deleteFromS3(imageUrl) {
   try {
+    // Extract the object key from the image URL (assuming the URL format is consistent)
+    const urlParts = imageUrl.split('/');
+    const objectKey = urlParts[urlParts.length - 1]; // Extract the last part of the URL as the object key
+
     const params = {
       Bucket: 'contactsimg',
       Key: objectKey,
     };
+
     const command = new DeleteObjectCommand(params);
     await s3.send(command);
     console.log('Object deleted successfully from S3');
